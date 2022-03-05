@@ -2,7 +2,8 @@ SRCS = pitch_work.cpp
 HDRS = /usr/local/include/chunking/Modul.h
 OBJS = canon_3.o
 CC = g++
-CFLAGS = -std=c++17 -g -O0 -Wall -Wextra -Wconversion
+CFLAGS = -std=c++17 -g -O0 -Wall 
+#-Wextra -Wconversion
 INCLUDES = /usr/local/include/chunking/
 TARGETS = sketch
 LIBCHUNKING = /usr/local/lib/libchunking.dylib

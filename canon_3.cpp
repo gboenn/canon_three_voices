@@ -91,8 +91,13 @@ void make_cadence_0 (int last_pivot, vector<int>& notes, string& lead, string& s
     else if (abs(finalis - apu) == 4) {
         // if major third is distance to the dux during cadence
         comes2_pivot += 1;
-        if (abs(apu - notes[comes2_pivot]) == 2)
+        if (abs(apu - notes[comes2_pivot]) == 2) {
+            cout << apu << " " << notes[comes2_pivot] << endl;
             apu = notes[comes2_pivot] - 1; // this has to be a half step only
+            
+        } else {
+            apu = notes[comes2_pivot];
+        }
         third += std::to_string(apu);
         third += ",";
         comes2_pivot -= 1;
@@ -115,7 +120,7 @@ void make_cadence_1 (int last_pivot, vector<int>& notes, string& lead, string& s
     // in option 1 (II.) comes1 one is one octave above dux (5th)
     int comes1_pivot = last_pivot + 7;
     // in option 1 (II.) comes2 one is 4 steps above dux (4th)
-    int comes2_pivot = last_pivot + 3;
+//    int comes2_pivot = last_pivot + 3;
     
     // do the cantizans cadence:
     vector<int> canti;
@@ -149,6 +154,10 @@ void make_cadence_1 (int last_pivot, vector<int>& notes, string& lead, string& s
     
     last_pivot -= 1; // lower a step
     apu1 = notes[last_pivot];
+    if((apu1-5)%12==0) {
+        // if penultima f then raise to f#
+        apu1++;
+    }
     canti.push_back(apu1);
     lead += std::to_string(apu1);
     lead += ",";
@@ -226,10 +235,6 @@ void make_cadence_2 (int last_pivot, vector<int>& notes, string& lead, string& s
     cout << "begin_cad: " << begin_cad << endl;
     last_pivot += 2; // rise a third
     int apu = notes[last_pivot];
-//    if ((apu+1) % 12 == 0){
-//        // if the movement by a third lands on b then make it b flat
-//        apu--;
-//    } else
     if ((apu-5) % 12 == 0){
         // if the movement by a third lands on f then make it f#
         apu++;
@@ -290,8 +295,6 @@ void make_cadence_2 (int last_pivot, vector<int>& notes, string& lead, string& s
     second += std::to_string(apu);
     second += ",";
     
-    // from where we are
-//    apu = notes[comes1_pivot];
     // down a step
     comes1_pivot -= 1;
     apu1 = notes[comes1_pivot];
@@ -309,10 +312,6 @@ void make_cadence_2 (int last_pivot, vector<int>& notes, string& lead, string& s
     //DOWN A STEP
     comes1_pivot -= 1;
     apu = notes[comes1_pivot];
-//    if ((apu+1) % 12 == 0){
-//        // if it lands on b then make it b flat
-//        apu--;
-//    }
     second += std::to_string(apu);
        second += ",";
     
@@ -322,7 +321,7 @@ void make_cadence_2 (int last_pivot, vector<int>& notes, string& lead, string& s
     // test last note of third voice so far:
     int ln = stoi(third.substr(third.length() - 3, 2)); // 3 because of last char == ','
     // and double digit midi notes
-    cout << "test last note of third voice so far: " << ln << endl;
+    // cout << "test last note of third voice so far: " << ln << endl;
     if ((ln - 6) % 12 == 0) {
         // if this note is an f#, lower to f
         --ln;
@@ -363,27 +362,18 @@ void make_cadence_3 (int last_pivot, vector<int>& notes, string& lead, string& s
         // if the movement by a third lands on b then make it b flat
         apu--;
     }
-//    if ((apu-5) % 12 == 0){
-//        // if the movement by a third lands on f then make it f#
-//        apu++;
-//    }
     canti.push_back(apu);
     lead += std::to_string(apu);
     lead += ",";
     
     last_pivot -= 3; //  lower a fourth
     int apu1 = notes[last_pivot];
-//    if ((apu1-5) % 12 == 0){
-//        // if the downstep lands on f then make it f#
-//        apu1++;
-//    }
     canti.push_back(apu1);
     lead += std::to_string(apu1);
     lead += ",";
     
     // go back up a fourth
     last_pivot += 3;
-//    apu = notes[last_pivot];
     canti.push_back(apu);
     lead += std::to_string(apu);
     lead += ",";
@@ -423,10 +413,6 @@ void make_cadence_3 (int last_pivot, vector<int>& notes, string& lead, string& s
     // down a fourth
     comes1_pivot -= 3;
     apu1 = notes[comes1_pivot];
-//    if ((apu1+1) % 12 == 0){
-//        // if it lands on b then make it b flat but not
-//        apu1--;
-//    }
     if ((apu1-5) % 12 == 0 && (finalis+2)%12!=0 ){
         // if it lands on f then make it f#
         // but not if it ends in Bb
@@ -448,16 +434,6 @@ void make_cadence_3 (int last_pivot, vector<int>& notes, string& lead, string& s
     // comes2 cadence
     // comes 2 ends on the picardian third (major)
     
-    // test last note of third voice so far:
-//    int ln = stoi(third.substr(third.length() - 3, 2)); // 3 because of last char == ','
-//    // and double digit midi notes
-//    cout << "test last note of third voice so far: " << ln << endl;
-//    if ((ln - 6) % 12 == 0) {
-//        // if this note is an f#, lower to f
-//        --ln;
-//        third.replace((third.length() - 3), 2, to_string(ln));
-//        cout << third << endl;
-//    }
     comes2_pivot -= 1;
     apu = notes[comes2_pivot];
     if ((apu-5)%12==0)
@@ -476,21 +452,36 @@ void make_cadence_3 (int last_pivot, vector<int>& notes, string& lead, string& s
 }
 
 int main (int argc, char *argv[]) {
+    string usage = "Usage: sketch <0,1,2, or 3> <optional: number of notes >=1 >\n";
     if (argc < 2) {
-        cout << "Usage: sketch option <0,1,2, or 3>" << endl;
+        cout << usage << endl;
         return 0;
     }
         
     string a = "";
-    for(int ndx{}; ndx != argc; ++ndx) {
+    int option = -1;
+    unsigned long num_notes = 12; // the number of notes
+    // this can be set by the command line
+    
+   for(int ndx{}; ndx != argc; ++ndx) {
         a = argv[ndx];
+        if (ndx == 1)
+            option = stoi(a);
+        if (ndx == 2)
+            num_notes = stoul(a);
     }
-    Modul m;
-    int option = stoi(a);
+    
     if (option < 0 || option > 3) {
-        cout << "Usage: sketch option <0,1,2, or 3>" << endl;
+        cout << usage << endl;
         return 0;
     }
+    
+    if (num_notes < 1) {
+        cout << usage << endl;
+        return 0;
+    }
+
+    Modul m;
     random_device rd;
     mt19937 md(rd());
     vector<int> scale = {2,2,1,2,2,2,1};
@@ -504,6 +495,8 @@ int main (int argc, char *argv[]) {
         }
     }
     
+    // in three-voice canons no step-wise motion
+    // except for embellishments, passing notes etc.
     cout << "at the fifth below" << endl;
     vector<int> intervals_5b = {3,0,-2,-4};
     if (option == 2 || option == 3) {
@@ -523,7 +516,6 @@ int main (int argc, char *argv[]) {
         pivot = 22; // D4
     }
     vector<int> dux;
-    unsigned long num_notes = 12;
     dux.push_back(notes[pivot]);
     int prev_note = notes[pivot];
     int curr_note = notes[pivot];
@@ -536,21 +528,20 @@ int main (int argc, char *argv[]) {
         curr_intv = intervals_5b[r];
         // no repetition after ascending fourth
         // in order to prevent parallel movement between the dux and the 3rd voice
-        if (curr_intv == 0 && prev_intv == 3) {
+        if (curr_intv == 0 && prev_intv == 3)
             continue;
-        }
         //avoid -3 0 -3 or 3 0 3 which creates parallels
-        if (abs(curr_intv) == 3 && prev_intv == 0 && abs(prpr_intv) == 3) {
+        if (abs(curr_intv) == 3 && prev_intv == 0 && abs(prpr_intv) == 3)
             continue;
-        }
-       
         // avoid a big interval after a small one in the same direction
         int check = abs(curr_intv + prev_intv);
         // avoid more than one note repitition
         int check2 = abs(curr_intv) + abs(prev_intv);
 //        avoid two thirds in a row and jumping fourth and fifth in a row
-//        cout << check << " (<4,!0) " << check2 << " (!6 !7 )" << endl;
+        cout << check << " (<4,!0) " << check2 << " (!6 !7 )" << endl;
         if (check < 4 && check != 0 && check2 != 6  && check2 != 7) {
+            cout << check << " (<4,!0) " << check2 << " (!6 !7 )" << endl;
+            // range checking (notes)
             if (pivot + curr_intv < 0)
                 continue;
             if (static_cast<unsigned long>(pivot + curr_intv) >= notes.size())
@@ -573,6 +564,21 @@ int main (int argc, char *argv[]) {
             // no tritone jump
             if (abs(curr_note - prev_note) != 6
                 && abs(curr_note - prev_note) < 9) {
+                if (option == 3) {
+                    // if very last note before the cadence
+                    // is a g (d) and before was an e (b)
+                    // then repeat e (b) instead (avoid diminished chord in line
+                    // and chromatic dissonant clashes with the 2 comes)
+                    if (dux.size() == num_notes-1){
+                        if ((curr_note+5)%12==0 && (prev_note-4)%12==0) {
+                            pivot -= curr_intv;
+                            curr_intv = prev_intv;
+                        } else if ((curr_note-2)%12==0 && (prev_note+1)%12==0) {
+                            pivot -= curr_intv;
+                            curr_intv = prev_intv;
+                        }
+                    }
+                }
                 dux.push_back(notes[pivot]);
                 prev_note = curr_note;
                 prpr_intv = prev_intv;
@@ -666,9 +672,9 @@ int main (int argc, char *argv[]) {
     output.close();
     rhy.close();
     m.Translate_Shorthand("rhythm.txt", "mel.txt", 8);
-    system("lilypond.sh transcription.ly");
-    system("preview.sh transcription.pdf");
-    system("timidity -T 180 transcription.midi");
+//    system("lilypond.sh transcription.ly");
+//    system("preview.sh transcription.pdf");
+//    system("timidity -T 180 transcription.midi");
   return 0;
 }
 
